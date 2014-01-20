@@ -31,8 +31,8 @@ class JavaTestNGSettings {
   ResolveConfiguration resolveConfiguration = new ResolveConfiguration()
       .with("provided", new TypeResolveConfiguration(true, true))
       .with("compile", new TypeResolveConfiguration(true, true))
-      .with("run", new TypeResolveConfiguration(true, true))
+      .with("runtime", new TypeResolveConfiguration(true, true))
       .with("test-compile", new TypeResolveConfiguration(true, true))
-      .with("test-run", new TypeResolveConfiguration(true, true))
+      .with("test-runtime", new TypeResolveConfiguration(true, true))
   Path reportDirectory = Paths.get("build/test-reports")
 }
