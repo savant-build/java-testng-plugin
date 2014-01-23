@@ -18,9 +18,6 @@ package org.savantbuild.plugin.java.testng
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import static org.savantbuild.dep.DependencyService.ResolveConfiguration
-import static org.savantbuild.dep.DependencyService.ResolveConfiguration.TypeResolveConfiguration
-
 /**
  * Settings class that defines the settings used by the TestNG plugin.
  */
@@ -28,11 +25,12 @@ class JavaTestNGSettings {
   String javaVersion
   String jvmArguments = ""
   int verbosity = 1
-  ResolveConfiguration resolveConfiguration = new ResolveConfiguration()
-      .with("provided", new TypeResolveConfiguration(true, true))
-      .with("compile", new TypeResolveConfiguration(true, true))
-      .with("runtime", new TypeResolveConfiguration(true, true))
-      .with("test-compile", new TypeResolveConfiguration(true, true))
-      .with("test-runtime", new TypeResolveConfiguration(true, true))
   Path reportDirectory = Paths.get("build/test-reports")
+  List<Map<String, Object>> dependencies = [
+      [group: "provided", transitive: true, fetchSource: false],
+      [group: "compile", transitive: true, fetchSource: false],
+      [group: "runtime", transitive: true, fetchSource: false],
+      [group: "test-compile", transitive: true, fetchSource: false],
+      [group: "test-runtime", transitive: true, fetchSource: false]
+  ]
 }

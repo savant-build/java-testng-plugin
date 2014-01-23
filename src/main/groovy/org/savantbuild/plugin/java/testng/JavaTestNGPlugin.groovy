@@ -14,6 +14,7 @@
  * language governing permissions and limitations under the License.
  */
 package org.savantbuild.plugin.java.testng
+
 import groovy.xml.MarkupBuilder
 import org.savantbuild.dep.domain.ArtifactID
 import org.savantbuild.domain.Project
@@ -28,6 +29,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.jar.JarFile
+
 /**
  * The Java TestNG plugin. The public methods on this class define the features of the plugin.
  */
@@ -56,9 +58,10 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
   void test() {
     initialize()
 
-    Classpath classpath = dependencyPlugin.classpath(settings.resolveConfiguration) {
-      project.publications.group("main").each { publication -> path(publication.file) }
-      project.publications.group("test").each { publication -> path(publication.file) }
+    Classpath classpath = dependencyPlugin.classpath {
+      settings.dependencies.each { deps -> dependencies(deps) }
+      project.publications.group("main").each { publication -> path(location: publication.file) }
+      project.publications.group("test").each { publication -> path(location: publication.file) }
     }
 
     Path xmlFile = buildXMLFile()
