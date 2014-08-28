@@ -25,6 +25,7 @@ import org.savantbuild.domain.Project
 import org.savantbuild.io.FileTools
 import org.savantbuild.output.Output
 import org.savantbuild.output.SystemOutOutput
+import org.savantbuild.runtime.RuntimeConfiguration
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
@@ -91,7 +92,7 @@ class JavaTestNGPluginTest {
 
   @Test
   public void test() throws Exception {
-    JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, output)
+    JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, new RuntimeConfiguration(), output)
     plugin.settings.javaVersion = "1.8"
 
     plugin.test()
@@ -103,7 +104,7 @@ class JavaTestNGPluginTest {
 
   @Test
   public void WithGroup() throws Exception {
-    JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, output)
+    JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, new RuntimeConfiguration(), output)
     plugin.settings.javaVersion = "1.8"
 
     plugin.test("unit")

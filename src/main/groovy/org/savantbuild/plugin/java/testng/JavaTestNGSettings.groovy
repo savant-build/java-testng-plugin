@@ -23,9 +23,13 @@ import java.nio.file.Paths
  */
 class JavaTestNGSettings {
   String javaVersion
+
   String jvmArguments = ""
+
   int verbosity = 1
+
   Path reportDirectory = Paths.get("build/test-reports")
+
   List<Map<String, Object>> dependencies = [
       [group: "provided", transitive: true, fetchSource: false],
       [group: "compile", transitive: true, fetchSource: false],

@@ -23,11 +23,13 @@ import org.savantbuild.lang.Classpath
 import org.savantbuild.output.Output
 import org.savantbuild.plugin.dep.DependencyPlugin
 import org.savantbuild.plugin.groovy.BaseGroovyPlugin
+import org.savantbuild.runtime.RuntimeConfiguration
 
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
 /**
@@ -46,10 +48,10 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
   Path javaPath
   DependencyPlugin dependencyPlugin
 
-  JavaTestNGPlugin(Project project, Output output) {
-    super(project, output)
+  JavaTestNGPlugin(Project project, RuntimeConfiguration runtimeConfiguration, Output output) {
+    super(project, runtimeConfiguration, output)
     properties = loadConfiguration(new ArtifactID("org.savantbuild.plugin", "java", "java", "jar"), ERROR_MESSAGE)
-    dependencyPlugin = new DependencyPlugin(project, output)
+    dependencyPlugin = new DependencyPlugin(project, runtimeConfiguration, output)
   }
 
   /**
@@ -73,8 +75,9 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     }
 
     Path xmlFile = buildXMLFile(groups)
-
     String command = "${javaPath} ${settings.jvmArguments} ${classpath.toString("-classpath ")} org.testng.TestNG -d ${settings.reportDirectory} ${xmlFile}"
+    output.debug("Running command [${command}]")
+
     Process process = command.execute(null, project.directory.toFile())
     process.consumeProcessOutput(System.out, System.err)
 
@@ -86,11 +89,15 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
   }
 
   Path buildXMLFile(String... groups) {
+    if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
+      output.info("Running tests that match [" + runtimeConfiguration.switches.valueSwitches.get("test").join(",") + "]")
+    }
+
     Set<String> classNames = new TreeSet<>()
     project.publications.group("test").each { publication ->
       JarFile jarFile = new JarFile(project.directory.resolve(publication.file).toFile())
       jarFile.entries().each { entry ->
-        if (!entry.directory && entry.name.endsWith("Test.class")) {
+        if (!entry.directory && includeEntry(entry)) {
           classNames.add(entry.name.replace("/", ".").replace(".class", ""))
         }
       }
@@ -118,6 +125,20 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     writer.close()
     output.debug("TestNG XML file contents are:\n${new String(Files.readAllBytes(xmlFile), "UTF-8")}")
     return xmlFile
+  }
+
+  boolean includeEntry(JarEntry entry) {
+    String name = entry.name
+    if (!name.endsWith("Test.class")) {
+      return false
+    }
+
+    if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
+      String testDef = runtimeConfiguration.switches.valueSwitches.get("test").find { testDef -> name.contains(testDef) }
+      return testDef != null
+    }
+
+    return true
   }
 
   private void initialize() {
