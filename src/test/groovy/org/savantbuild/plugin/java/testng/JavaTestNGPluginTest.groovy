@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,13 +72,13 @@ class JavaTestNGPluginTest {
     project.version = new Version("1.0")
     project.license = License.Apachev2
 
-    project.publications.add("main", new Publication(new Artifact("org.savantbuild.test:test-project:1.0.0", License.Commercial), new ArtifactMetaData(null, License.Commercial),
+    project.publications.add("main", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:1.0.0", License.Commercial), new ArtifactMetaData(null, License.Commercial),
         Paths.get("build/jars/test-project-1.0.0.jar"), null))
-    project.publications.add("test", new Publication(new Artifact("org.savantbuild.test:test-project:test-project-test:1.0.0:jar", License.Commercial), new ArtifactMetaData(null, License.Commercial),
+    project.publications.add("test", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:test-project-test:1.0.0:jar", License.Commercial), new ArtifactMetaData(null, License.Commercial),
         Paths.get("build/jars/test-project-test-1.0.0.jar"), null))
 
     Path repositoryPath = Paths.get(System.getProperty("user.home"), "dev/inversoft/repositories/savant")
-    project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Dependency("org.testng:testng:6.8.7:jar", false)))
+    project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8.7:jar")))
     project.workflow = new Workflow(
         new FetchWorkflow(output,
             new CacheProcess(output, projectDir.resolve("build/cache").toString()),
