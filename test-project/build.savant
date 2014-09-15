@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-project(group: "org.savantbuild.test", name: "test-project", version: "1.0.0", license: "Apachev2") {
+project(group: "org.savantbuild.test", name: "test-project", version: "1.0.0", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }

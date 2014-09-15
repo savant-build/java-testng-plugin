@@ -26,6 +26,7 @@ import org.savantbuild.io.FileTools
 import org.savantbuild.output.Output
 import org.savantbuild.output.SystemOutOutput
 import org.savantbuild.runtime.RuntimeConfiguration
+import org.savantbuild.util.MapBuilder
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
@@ -70,11 +71,11 @@ class JavaTestNGPluginTest {
     project.group = "org.savantbuild.test"
     project.name = "test-project"
     project.version = new Version("1.0")
-    project.license = License.Apachev2
+    project.licenses.put(License.ApacheV2_0, null)
 
-    project.publications.add("main", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:1.0.0", License.Commercial), new ArtifactMetaData(null, License.Commercial),
+    project.publications.add("main", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:1.0.0", MapBuilder.simpleMap(License.Commercial, null)), new ArtifactMetaData(null, MapBuilder.simpleMap(License.Commercial, null)),
         Paths.get("build/jars/test-project-1.0.0.jar"), null))
-    project.publications.add("test", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:test-project-test:1.0.0:jar", License.Commercial), new ArtifactMetaData(null, License.Commercial),
+    project.publications.add("test", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:test-project-test:1.0.0:jar", MapBuilder.simpleMap(License.Commercial, null)), new ArtifactMetaData(null, MapBuilder.simpleMap(License.Commercial, null)),
         Paths.get("build/jars/test-project-test-1.0.0.jar"), null))
 
     Path repositoryPath = Paths.get(System.getProperty("user.home"), "dev/inversoft/repositories/savant")
