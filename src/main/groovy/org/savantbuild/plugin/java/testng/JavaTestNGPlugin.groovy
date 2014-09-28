@@ -59,13 +59,12 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
    * Otherwise, all the tests are run. Here is an example calling this method:
    * <p>
    * <pre>
-   *   groovyTestNG.test("unit", "integration")
-   *   groovyTestNG.test()
+   *   groovyTestNG.test(groups: ["unit", "performance"])
    * </pre>
    *
-   * @param groups (Optional) The groups to run.
+   * @param attributes The named attributes.
    */
-  void test(String... groups) {
+  void test(Map<String, Object> attributes) {
     initialize()
 
     Classpath classpath = dependencyPlugin.classpath {
@@ -74,9 +73,9 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
       project.publications.group("test").each { publication -> path(location: publication.file) }
     }
 
-    Path xmlFile = buildXMLFile(groups)
+    Path xmlFile = buildXMLFile(attributes["groups"])
     String command = "${javaPath} ${settings.jvmArguments} ${classpath.toString("-classpath ")} org.testng.TestNG -d ${settings.reportDirectory} ${xmlFile}"
-    output.debug("Running command [${command}]")
+    output.debug("Running command [%s]", command)
 
     Process process = command.execute(null, project.directory.toFile())
     process.consumeProcessOutput(System.out, System.err)
@@ -88,7 +87,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     }
   }
 
-  Path buildXMLFile(String... groups) {
+  Path buildXMLFile(List<String> groups) {
     if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
       output.info("Running tests that match [" + runtimeConfiguration.switches.valueSwitches.get("test").join(",") + "]")
     }
@@ -108,7 +107,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     MarkupBuilder xml = new MarkupBuilder(writer)
     xml.suite(name: "All Tests", "allow-return-values": "true", verbose: "${settings.verbosity}") {
       delegate.test(name: "All Tests") {
-        if (groups != null && groups.length > 0) {
+        if (groups != null && groups.size() > 0) {
           delegate.groups {
             delegate.run {
               groups.each { group -> delegate.include(name: group) }
