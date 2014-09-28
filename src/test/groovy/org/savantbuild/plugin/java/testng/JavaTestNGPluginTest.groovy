@@ -108,10 +108,10 @@ class JavaTestNGPluginTest {
     JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, new RuntimeConfiguration(), output)
     plugin.settings.javaVersion = "1.8"
 
-    plugin.test("unit")
+    plugin.test(groups: ["unit"])
     assertTestsRan("org.savantbuild.test.MyClassUnitTest")
 
-    plugin.test("integration")
+    plugin.test(groups : ["integration"])
     assertTestsRan("org.savantbuild.test.MyClassIntegrationTest")
   }
 

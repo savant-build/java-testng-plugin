@@ -67,6 +67,11 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
   void test(Map<String, Object> attributes) {
     initialize()
 
+    // Initialize the attributes if they are null
+    if (!attributes) {
+      attributes = [:]
+    }
+
     Classpath classpath = dependencyPlugin.classpath {
       settings.dependencies.each { deps -> dependencies(deps) }
       project.publications.group("main").each { publication -> path(location: publication.file) }
