@@ -15,7 +15,18 @@
  */
 package org.savantbuild.plugin.java.testng
 
-import org.savantbuild.dep.domain.*
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+
+import org.savantbuild.dep.domain.Artifact
+import org.savantbuild.dep.domain.ArtifactMetaData
+import org.savantbuild.dep.domain.Dependencies
+import org.savantbuild.dep.domain.DependencyGroup
+import org.savantbuild.dep.domain.License
+import org.savantbuild.dep.domain.Publication
+import org.savantbuild.dep.domain.ReifiedArtifact
+import org.savantbuild.dep.domain.Version
 import org.savantbuild.dep.workflow.FetchWorkflow
 import org.savantbuild.dep.workflow.PublishWorkflow
 import org.savantbuild.dep.workflow.Workflow
@@ -31,12 +42,9 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
 
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-
 import static java.util.Arrays.asList
 import static org.testng.Assert.assertEquals
+import static org.testng.Assert.assertFalse
 import static org.testng.Assert.assertTrue
 
 /**
@@ -104,14 +112,26 @@ class JavaTestNGPluginTest {
   }
 
   @Test
-  public void WithGroup() throws Exception {
+  public void skipTests() throws Exception {
+    RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration()
+    runtimeConfiguration.switches.booleanSwitches.add("skipTests")
+
+    JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, runtimeConfiguration, output)
+    plugin.settings.javaVersion = "1.8"
+
+    plugin.test()
+    assertFalse(Files.isDirectory(projectDir.resolve("test-project/build/test-reports")))
+  }
+
+  @Test
+  public void withGroup() throws Exception {
     JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, new RuntimeConfiguration(), output)
     plugin.settings.javaVersion = "1.8"
 
     plugin.test(groups: ["unit"])
     assertTestsRan("org.savantbuild.test.MyClassUnitTest")
 
-    plugin.test(groups : ["integration"])
+    plugin.test(groups: ["integration"])
     assertTestsRan("org.savantbuild.test.MyClassIntegrationTest")
   }
 

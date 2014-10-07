@@ -15,7 +15,13 @@
  */
 package org.savantbuild.plugin.java.testng
 
-import groovy.xml.MarkupBuilder
+import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
+
 import org.savantbuild.dep.domain.ArtifactID
 import org.savantbuild.domain.Project
 import org.savantbuild.io.FileTools
@@ -25,12 +31,7 @@ import org.savantbuild.plugin.dep.DependencyPlugin
 import org.savantbuild.plugin.groovy.BaseGroovyPlugin
 import org.savantbuild.runtime.RuntimeConfiguration
 
-import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.jar.JarEntry
-import java.util.jar.JarFile
+import groovy.xml.MarkupBuilder
 
 /**
  * The Java TestNG plugin. The public methods on this class define the features of the plugin.
@@ -43,10 +44,14 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
       "  1.6=/Library/Java/JavaVirtualMachines/1.6.0_65-b14-462.jdk/Contents/Home\n" +
       "  1.7=/Library/Java/JavaVirtualMachines/jdk1.7.0_10.jdk/Contents/Home\n" +
       "  1.8=/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home\n"
-  JavaTestNGSettings settings = new JavaTestNGSettings()
-  Properties properties
-  Path javaPath
+
   DependencyPlugin dependencyPlugin
+
+  Path javaPath
+
+  Properties properties
+
+  JavaTestNGSettings settings = new JavaTestNGSettings()
 
   JavaTestNGPlugin(Project project, RuntimeConfiguration runtimeConfiguration, Output output) {
     super(project, runtimeConfiguration, output)
@@ -65,6 +70,11 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
    * @param attributes The named attributes.
    */
   void test(Map<String, Object> attributes) {
+    if (runtimeConfiguration.switches.booleanSwitches.contains("skipTests")) {
+      output.info("Skipping tests")
+      return
+    }
+
     initialize()
 
     // Initialize the attributes if they are null
