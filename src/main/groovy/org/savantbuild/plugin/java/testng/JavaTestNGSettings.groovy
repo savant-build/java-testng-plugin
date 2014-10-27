@@ -31,10 +31,10 @@ class JavaTestNGSettings {
   Path reportDirectory = Paths.get("build/test-reports")
 
   List<Map<String, Object>> dependencies = [
-      [group: "provided", transitive: true, fetchSource: false],
-      [group: "compile", transitive: true, fetchSource: false],
-      [group: "runtime", transitive: true, fetchSource: false],
-      [group: "test-compile", transitive: true, fetchSource: false],
-      [group: "test-runtime", transitive: true, fetchSource: false]
+      [group: "provided", transitive: true, fetchSource: false, transitiveGroups: ["provided", "compile", "runtime"]],
+      [group: "compile", transitive: true, fetchSource: false, transitiveGroups: ["provided", "compile", "runtime"]],
+      [group: "runtime", transitive: true, fetchSource: false, transitiveGroups: ["provided", "compile", "runtime"]],
+      [group: "test-compile", transitive: true, fetchSource: false, transitiveGroups: ["provided", "compile", "runtime"]],
+      [group: "test-runtime", transitive: true, fetchSource: false, transitiveGroups: ["provided", "compile", "runtime"]]
   ]
 }
