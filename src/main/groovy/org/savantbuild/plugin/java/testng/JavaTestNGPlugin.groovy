@@ -71,7 +71,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
    */
   void test(Map<String, Object> attributes) {
     if (runtimeConfiguration.switches.booleanSwitches.contains("skipTests")) {
-      output.info("Skipping tests")
+      output.infoln("Skipping tests")
       return
     }
 
@@ -90,7 +90,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
 
     Path xmlFile = buildXMLFile(attributes["groups"])
     String command = "${javaPath} ${settings.jvmArguments} ${classpath.toString("-classpath ")} org.testng.TestNG -d ${settings.reportDirectory} ${xmlFile}"
-    output.debug("Running command [%s]", command)
+    output.debugln("Running command [%s]", command)
 
     Process process = command.execute(null, project.directory.toFile())
     process.consumeProcessOutput(System.out, System.err)
@@ -104,7 +104,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
 
   Path buildXMLFile(List<String> groups) {
     if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
-      output.info("Running tests that match [" + runtimeConfiguration.switches.valueSwitches.get("test").join(",") + "]")
+      output.infoln("Running tests that match [" + runtimeConfiguration.switches.valueSwitches.get("test").join(",") + "]")
     }
 
     Set<String> classNames = new TreeSet<>()
@@ -137,7 +137,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
 
     writer.flush()
     writer.close()
-    output.debug("TestNG XML file contents are:\n${new String(Files.readAllBytes(xmlFile), "UTF-8")}")
+    output.debugln("TestNG XML file contents are:\n${new String(Files.readAllBytes(xmlFile), "UTF-8")}")
     return xmlFile
   }
 
