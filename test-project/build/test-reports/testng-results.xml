@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="1" passed="1">
+  <reporter-output>
+  </reporter-output>
+  <suite name="All Tests" duration-ms="13" started-at="2016-03-28T20:45:14Z" finished-at="2016-03-28T20:45:14Z">
+    <groups>
+      <group name="integration">
+        <method signature="MyClassIntegrationTest.doSomething()[pri:0, instance:org.savantbuild.test.MyClassIntegrationTest@6fdb1f78]" name="doSomething" class="org.savantbuild.test.MyClassIntegrationTest"/>
+      </group> <!-- integration -->
+    </groups>
+    <test name="All Tests" duration-ms="13" started-at="2016-03-28T20:45:14Z" finished-at="2016-03-28T20:45:14Z">
+      <class name="org.savantbuild.test.MyClassIntegrationTest">
+        <test-method status="PASS" signature="doSomething()[pri:0, instance:org.savantbuild.test.MyClassIntegrationTest@6fdb1f78]" name="doSomething" duration-ms="7" started-at="2016-03-28T14:45:14Z" finished-at="2016-03-28T14:45:14Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- doSomething -->
+      </class> <!-- org.savantbuild.test.MyClassIntegrationTest -->
+    </test> <!-- All Tests -->
+  </suite> <!-- All Tests -->
+</testng-results>
