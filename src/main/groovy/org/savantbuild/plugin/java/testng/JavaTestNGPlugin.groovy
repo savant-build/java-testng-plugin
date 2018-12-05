@@ -84,8 +84,10 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
 
     Classpath classpath = dependencyPlugin.classpath {
       settings.dependencies.each { deps -> dependencies(deps) }
-      project.publications.group("main").each { publication -> path(location: publication.file) }
-      project.publications.group("test").each { publication -> path(location: publication.file) }
+
+      // Publications are already resolved by now, therefore, we convert them to absolute paths so they won't be resolved again
+      project.publications.group("main").each { publication -> path(location: publication.file.toAbsolutePath()) }
+      project.publications.group("test").each { publication -> path(location: publication.file.toAbsolutePath()) }
     }
 
     Path xmlFile = buildXMLFile(attributes["groups"])
@@ -109,7 +111,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
 
     Set<String> classNames = new TreeSet<>()
     project.publications.group("test").each { publication ->
-      JarFile jarFile = new JarFile(project.directory.resolve(publication.file).toFile())
+      JarFile jarFile = new JarFile(publication.file.toFile())
       jarFile.entries().each { entry ->
         if (!entry.directory && includeEntry(entry)) {
           classNames.add(entry.name.replace("/", ".").replace(".class", ""))
