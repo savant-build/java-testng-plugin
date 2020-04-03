@@ -123,7 +123,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     BufferedWriter writer = Files.newBufferedWriter(xmlFile, Charset.forName("UTF-8"))
     MarkupBuilder xml = new MarkupBuilder(writer)
     xml.mkp.xmlDeclaration(version: "1.0", encoding: "UTF-8")
-    xml.mkp.yieldUnescaped('<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >\n')
+    xml.mkp.yieldUnescaped('<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">\n')
     xml.suite(name: "All Tests", "allow-return-values": "true", verbose: "${settings.verbosity}") {
       delegate.test(name: "All Tests") {
         if (groups != null && groups.size() > 0) {
