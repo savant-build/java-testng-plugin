@@ -15,7 +15,7 @@
  */
 savantVersion = "1.0.0"
 
-project(group: "org.savantbuild.plugin", name: "java-testng", version: "1.0.6", licenses: ["ApacheV2_0"]) {
+project(group: "org.savantbuild.plugin", name: "java-testng", version: "1.0.7", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -36,7 +36,7 @@ project(group: "org.savantbuild.plugin", name: "java-testng", version: "1.0.6", 
       dependency(id: "org.savantbuild.plugin:file:1.0.2")
     }
     group(name: "test-compile", export: false) {
-      dependency(id: "org.testng:testng:6.8.7")
+      dependency(id: "org.testng:testng:6.14.3")
     }
   }
 
