@@ -137,6 +137,14 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
           classNames.each { className -> delegate."class"(name: className) }
         }
       }
+
+      if (!settings.listeners.empty) {
+        xml.listeners {
+          settings.listeners.each { listenerClass ->
+            listener("class-name": listenerClass)
+          }
+        }
+      }
     }
 
     writer.flush()

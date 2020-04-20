@@ -30,6 +30,8 @@ class JavaTestNGSettings {
 
   Path reportDirectory = Paths.get("build/test-reports")
 
+  List<String> listeners = []
+
   List<Map<String, Object>> dependencies = [
       [group: "provided", transitive: true, fetchSource: false, transitiveGroups: ["provided", "compile", "runtime"]],
       [group: "compile", transitive: true, fetchSource: false, transitiveGroups: ["provided", "compile", "runtime"]],
