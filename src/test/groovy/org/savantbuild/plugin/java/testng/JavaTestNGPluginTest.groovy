@@ -46,6 +46,7 @@ import static java.util.Arrays.asList
 import static org.testng.Assert.assertEquals
 import static org.testng.Assert.assertFalse
 import static org.testng.Assert.assertTrue
+import static org.testng.Assert.fail
 
 /**
  * Tests the Java TestNG plugin.
@@ -123,6 +124,32 @@ class JavaTestNGPluginTest {
   }
 
   @Test
+  void testSwitch() throws Exception {
+    RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration()
+
+    JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, runtimeConfiguration, output)
+    plugin.settings.javaVersion = "1.8"
+
+    // Simple name
+    runtimeConfiguration.switches.add("test", "MyClassTest")
+    plugin.test()
+    assertTestsRan("org.savantbuild.test.MyClassTest")
+    assertTestsDidNotRun("org.savantbuild.test.MyClassIntegrationTest", "org.savantbuild.test.MyClassUnitTest")
+
+    // Fully qualified name
+    runtimeConfiguration.switches.add("test", "org.savantbuild.test.MyClassTest")
+    plugin.test()
+    assertTestsRan("org.savantbuild.test.MyClassTest")
+    assertTestsDidNotRun("org.savantbuild.test.MyClassIntegrationTest", "org.savantbuild.test.MyClassUnitTest")
+
+    // Fuzzy
+    runtimeConfiguration.switches.add("test", "MyClass")
+    plugin.test()
+    assertTestsRan("org.savantbuild.test.MyClassTest", "org.savantbuild.test.MyClassIntegrationTest", "org.savantbuild.test.MyClassUnitTest")
+    assertTestsDidNotRun()
+  }
+
+  @Test
   void withGroup() throws Exception {
     JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, new RuntimeConfiguration(), output)
     plugin.settings.javaVersion = "1.8"
@@ -132,6 +159,21 @@ class JavaTestNGPluginTest {
 
     plugin.test(groups: ["integration"])
     assertTestsRan("org.savantbuild.test.MyClassIntegrationTest")
+  }
+
+  static void assertTestsDidNotRun(String... classNames) {
+    assertTrue(Files.isDirectory(projectDir.resolve("test-project/build/test-reports")))
+    assertTrue(Files.isReadable(projectDir.resolve("test-project/build/test-reports/All Tests/All Tests.xml")))
+
+    def testsuite = new XmlSlurper().parse(projectDir.resolve("test-project/build/test-reports/All Tests/All Tests.xml").toFile())
+    Set<String> tested = new HashSet<>()
+    testsuite.testcase.each { testcase -> tested << testcase.@classname.text() }
+
+    for (String className : classNames) {
+      if (tested.contains(className)) {
+        fail("Test [" + className + "] was not expected to run.")
+      }
+    }
   }
 
   static void assertTestsRan(String... classNames) {

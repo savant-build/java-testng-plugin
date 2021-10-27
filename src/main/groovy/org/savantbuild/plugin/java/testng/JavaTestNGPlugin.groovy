@@ -159,9 +159,19 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
       return false
     }
 
+    String modifiedName = name.substring(0, name.length() - 6)
+    String simpleName = modifiedName.substring(name.lastIndexOf("/") + 1)
+    String fqName = modifiedName.replace("/", ".")
+
     if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
-      String testDef = runtimeConfiguration.switches.valueSwitches.get("test").find { testDef -> name.contains(testDef) }
-      return testDef != null
+      String requestedTest = runtimeConfiguration.switches.valueSwitches.get("test")
+      if (requestedTest == simpleName || requestedTest == fqName) {
+        return true
+      } else {
+        // Else do a fuzzy match, match all tests with the name in it
+        String testDef = runtimeConfiguration.switches.valueSwitches.get("test").find { testDef -> name.contains(testDef) }
+        return testDef != null
+      }
     }
 
     return true
