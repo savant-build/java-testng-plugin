@@ -105,10 +105,6 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
   }
 
   Path buildXMLFile(List<String> groups) {
-    if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
-      output.infoln("Running tests that match [" + runtimeConfiguration.switches.valueSwitches.get("test").join(",") + "]")
-    }
-
     Set<String> classNames = new TreeSet<>()
     project.publications.group("test").each { publication ->
       JarFile jarFile = new JarFile(publication.file.toFile())
@@ -117,6 +113,12 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
           classNames.add(entry.name.replace("/", ".").replace(".class", ""))
         }
       }
+    }
+
+    if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
+      output.infoln("Running [${classNames.size()}] tests requested by the test switch matching [" + runtimeConfiguration.switches.valueSwitches.get("test").join(",") + "]")
+    } else {
+      output.infoln("Running all tests. Found [${classNames.size()}] tests.")
     }
 
     Path xmlFile = FileTools.createTempPath("savant", "testng.xml", true)
@@ -164,14 +166,22 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     String fqName = modifiedName.replace("/", ".")
 
     if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
-      String requestedTest = runtimeConfiguration.switches.valueSwitches.get("test")
-      if (requestedTest == simpleName || requestedTest == fqName) {
-        return true
-      } else {
-        // Else do a fuzzy match, match all tests with the name in it
-        String testDef = runtimeConfiguration.switches.valueSwitches.get("test").find { testDef -> name.contains(testDef) }
-        return testDef != null
+      List<String> requestedTests = runtimeConfiguration.switches.valueSwitches.get("test")
+      // If we have an exact match, keep it.
+      for (String test : requestedTests) {
+        if (test == simpleName || test == fqName) {
+          return true
+        }
       }
+
+      // Else do a fuzzy match, match all tests with the name in it
+      for (String test : requestedTests) {
+        if (name.contains(test)) {
+          return true;
+        }
+      }
+
+      return false;
     }
 
     return true
