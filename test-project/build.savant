@@ -15,7 +15,13 @@
  */
 project(group: "org.savantbuild.test", name: "test-project", version: "1.0.0", licenses: ["ApacheV2_0"]) {
   workflow {
-    standard()
+    fetch {
+      cache()
+      url(url: "https://repository.savantbuild.org")
+    }
+    publish {
+      cache()
+    }
   }
 
   dependencies {

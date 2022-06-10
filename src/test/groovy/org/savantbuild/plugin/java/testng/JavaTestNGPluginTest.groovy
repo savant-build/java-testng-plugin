@@ -91,7 +91,7 @@ class JavaTestNGPluginTest {
     project.workflow = new Workflow(
         new FetchWorkflow(output,
             new CacheProcess(output, projectDir.resolve("build/cache").toString()),
-            new URLProcess(output, "http://savant.inversoft.org", null, null)
+            new URLProcess(output, "https://repository.savantbuild.org", null, null)
         ),
         new PublishWorkflow(
             new CacheProcess(output, projectDir.resolve("build/cache").toString())
