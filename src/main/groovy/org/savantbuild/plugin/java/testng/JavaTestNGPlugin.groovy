@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,13 @@
  */
 package org.savantbuild.plugin.java.testng
 
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
@@ -30,6 +33,9 @@ import org.savantbuild.output.Output
 import org.savantbuild.plugin.dep.DependencyPlugin
 import org.savantbuild.plugin.groovy.BaseGroovyPlugin
 import org.savantbuild.runtime.RuntimeConfiguration
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.NodeList
 
 import groovy.xml.MarkupBuilder
 
@@ -100,25 +106,55 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     int result = process.waitFor()
     Files.delete(xmlFile)
     if (result != 0) {
+      // Keep a copy of the last set of test results when there is a failure.
+      Path testResults = project.directory.resolve("build/test-reports/testng-results.xml")
+      if (testResults.toFile().exists()) {
+        Path target = getLastTestResultsPath()
+        Files.deleteIfExists(target);
+        Files.createDirectories(target.getParent())
+        Files.createFile(target)
+        Files.copy(testResults,
+            target,
+            StandardCopyOption.REPLACE_EXISTING)
+      }
+
       fail("Build failed.")
     }
   }
 
   Path buildXMLFile(List<String> groups) {
     Set<String> classNames = new TreeSet<>()
-    project.publications.group("test").each { publication ->
-      JarFile jarFile = new JarFile(publication.file.toFile())
-      jarFile.entries().each { entry ->
-        if (!entry.directory && includeEntry(entry)) {
-          classNames.add(entry.name.replace("/", ".").replace(".class", ""))
+
+    if (runtimeConfiguration.switches.booleanSwitches.contains("onlyFailed")) {
+      output.infoln("Retry previously failed tests.")
+      File testResults = getLastTestResultsPath().toFile()
+      if (testResults.exists()) {
+        findFailedTests(testResults, classNames)
+        String summary = ""
+        for (String s : classNames) {
+          summary += " - " + s
+        }
+
+        output.infoln("Found [" + classNames.size() + "] failed tests to run.\n" + String.join("\n", summary))
+      } else {
+        output.infoln("No test results found from a prior test run. File not found [" + testResults.toString() + "].")
+      }
+    } else {
+      // Normal test execution, collect all tests
+      project.publications.group("test").each { publication ->
+        JarFile jarFile = new JarFile(publication.file.toFile())
+        jarFile.entries().each { entry ->
+          if (!entry.directory && includeEntry(entry)) {
+            classNames.add(entry.name.replace("/", ".").replace(".class", ""))
+          }
         }
       }
-    }
 
-    if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
-      output.infoln("Running [${classNames.size()}] tests requested by the test switch matching [" + runtimeConfiguration.switches.valueSwitches.get("test").join(",") + "]")
-    } else {
-      output.infoln("Running all tests. Found [${classNames.size()}] tests.")
+      if (runtimeConfiguration.switches.valueSwitches.containsKey("test")) {
+        output.infoln("Running [${classNames.size()}] tests requested by the test switch matching [" + runtimeConfiguration.switches.valueSwitches.get("test").join(",") + "]")
+      } else {
+        output.infoln("Running all tests. Found [${classNames.size()}] tests.")
+      }
     }
 
     Path xmlFile = FileTools.createTempPath("savant", "testng.xml", true)
@@ -205,5 +241,31 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     if (!Files.isExecutable(javaPath)) {
       fail("The java executable [${javaPath.toAbsolutePath()}] is not executable.")
     }
+  }
+
+  private findFailedTests(File testResults, Set<String> classNames) {
+    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+    Document document = documentBuilder.parse(testResults);
+
+    def testElement = (Element) document.getElementsByTagName("test").item(0);
+    NodeList testClasses = testElement.getElementsByTagName("class")
+    for (int i=0; i < testClasses.length; i++) {
+      def testClassElement = (Element) testClasses.item(i)
+      NodeList testMethods = testClassElement.getElementsByTagName("test-method")
+      for (int j=0; j < testMethods.length; j++) {
+        def testMethodElement = (Element) testMethods.item(j)
+        if ("FAIL" == testMethodElement.getAttribute("status")) {
+          // Currently if any methods fail in a class, we are going to re-run the entire test class.
+          classNames.add(testClassElement.getAttribute("name"))
+          break;
+        }
+      }
+    }
+  }
+
+  private Path getLastTestResultsPath() {
+    String tmpDir = System.getProperty("java.io.tmpdir")
+    return Paths.get(tmpDir).resolve(project.name + "/test-reports/last/testng-results.xml")
   }
 }
