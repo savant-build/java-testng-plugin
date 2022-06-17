@@ -130,12 +130,12 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
       File testResults = getLastTestResultsPath().toFile()
       if (testResults.exists()) {
         findFailedTests(testResults, classNames)
-        String summary = ""
+        List<String> dashTestFlags = new ArrayList<>()
         for (String s : classNames) {
-          summary += " - " + s
+          dashTestFlags.add("--test=" + s)
         }
 
-        output.infoln("Found [" + classNames.size() + "] failed tests to run.\n" + String.join("\n", summary))
+        output.infoln("Found [" + classNames.size() + "] failed tests to run. Equivalent to running:\n" + String.join(" ", dashTestFlags))
       } else {
         output.infoln("No test results found from a prior test run. File not found [" + testResults.toString() + "].")
       }
