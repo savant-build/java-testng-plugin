@@ -42,6 +42,7 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
 
+import groovy.xml.XmlSlurper
 import static java.util.Arrays.asList
 import static org.testng.Assert.assertEquals
 import static org.testng.Assert.assertFalse
