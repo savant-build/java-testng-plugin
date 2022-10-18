@@ -26,6 +26,8 @@ class JavaTestNGSettings {
 
   String jvmArguments = ""
 
+  String testngArguments = ""
+
   int verbosity = 1
 
   Path reportDirectory = Paths.get("build/test-reports")
