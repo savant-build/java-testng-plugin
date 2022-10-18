@@ -151,6 +151,18 @@ class JavaTestNGPluginTest {
   }
 
   @Test
+  void withExclude() throws Exception {
+    JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, new RuntimeConfiguration(), output)
+    plugin.settings.javaVersion = "1.8"
+
+    plugin.test(exclude: ["unit"])
+    assertTestsRan("org.savantbuild.test.MyClassTest", "org.savantbuild.test.MyClassIntegrationTest")
+
+    plugin.test(exclude: ["integration"])
+    assertTestsRan("org.savantbuild.test.MyClassTest", "org.savantbuild.test.MyClassUnitTest")
+  }
+
+  @Test
   void withGroup() throws Exception {
     JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, new RuntimeConfiguration(), output)
     plugin.settings.javaVersion = "1.8"

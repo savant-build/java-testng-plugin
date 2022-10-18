@@ -96,7 +96,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
       project.publications.group("test").each { publication -> path(location: publication.file.toAbsolutePath()) }
     }
 
-    Path xmlFile = buildXMLFile(attributes["groups"])
+    Path xmlFile = buildXMLFile(attributes["groups"], attributes["exclude"])
     String command = "${javaPath} ${settings.jvmArguments} ${classpath.toString("-classpath ")} org.testng.TestNG -d ${settings.reportDirectory} ${xmlFile}"
     output.debugln("Running command [%s]", command)
 
@@ -122,7 +122,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     }
   }
 
-  Path buildXMLFile(List<String> groups) {
+  Path buildXMLFile(List<String> groups, List<String> excludes) {
     Set<String> classNames = new TreeSet<>()
 
     if (runtimeConfiguration.switches.booleanSwitches.contains("onlyFailed")) {
@@ -164,13 +164,19 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     xml.mkp.yieldUnescaped('<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">\n')
     xml.suite(name: "All Tests", "allow-return-values": "true", verbose: "${settings.verbosity}") {
       delegate.test(name: "All Tests") {
-        if (groups != null && groups.size() > 0) {
+        if ((groups != null && groups.size() > 0) || (excludes != null && excludes.size() > 0)) {
           delegate.groups {
             delegate.run {
-              groups.each { group -> delegate.include(name: group) }
+              if (groups != null) {
+                groups.each { group -> delegate.include(name: group) }
+              }
+              if (excludes != null) {
+                excludes.each { group -> delegate.exclude(name: group) }
+              }
             }
           }
         }
+
         delegate.classes {
           classNames.each { className -> delegate."class"(name: className) }
         }
