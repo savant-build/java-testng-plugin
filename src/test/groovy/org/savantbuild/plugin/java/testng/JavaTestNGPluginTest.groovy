@@ -26,18 +26,17 @@ import org.savantbuild.dep.domain.DependencyGroup
 import org.savantbuild.dep.domain.License
 import org.savantbuild.dep.domain.Publication
 import org.savantbuild.dep.domain.ReifiedArtifact
-import org.savantbuild.dep.domain.Version
 import org.savantbuild.dep.workflow.FetchWorkflow
 import org.savantbuild.dep.workflow.PublishWorkflow
 import org.savantbuild.dep.workflow.Workflow
 import org.savantbuild.dep.workflow.process.CacheProcess
 import org.savantbuild.dep.workflow.process.URLProcess
 import org.savantbuild.domain.Project
+import org.savantbuild.domain.Version
 import org.savantbuild.io.FileTools
 import org.savantbuild.output.Output
 import org.savantbuild.output.SystemOutOutput
 import org.savantbuild.runtime.RuntimeConfiguration
-import org.savantbuild.util.MapBuilder
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
@@ -81,11 +80,11 @@ class JavaTestNGPluginTest {
     project.group = "org.savantbuild.test"
     project.name = "test-project"
     project.version = new Version("1.0")
-    project.licenses.put(License.ApacheV2_0, null)
+    project.licenses.add(License.parse("ApacheV2_0", null))
 
-    project.publications.add("main", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:1.0.0", MapBuilder.simpleMap(License.Commercial, null)), new ArtifactMetaData(null, MapBuilder.simpleMap(License.Commercial, null)),
+    project.publications.add("main", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:1.0.0", [License.parse("Commercial", "License")]), new ArtifactMetaData(null, [License.parse("Commercial", "License")]),
         project.directory.resolve("build/jars/test-project-1.0.0.jar"), null))
-    project.publications.add("test", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:test-project-test:1.0.0:jar", MapBuilder.simpleMap(License.Commercial, null)), new ArtifactMetaData(null, MapBuilder.simpleMap(License.Commercial, null)),
+    project.publications.add("test", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:test-project-test:1.0.0:jar", [License.parse("Commercial", "License")]), new ArtifactMetaData(null, [License.parse("Commercial", "License")]),
         project.directory.resolve("build/jars/test-project-test-1.0.0.jar"), null))
 
     project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8.7:jar", false)))
