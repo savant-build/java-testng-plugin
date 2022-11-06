@@ -87,7 +87,7 @@ class JavaTestNGPluginTest {
     project.publications.add("test", new Publication(new ReifiedArtifact("org.savantbuild.test:test-project:test-project-test:1.0.0:jar", [License.parse("Commercial", "License")]), new ArtifactMetaData(null, [License.parse("Commercial", "License")]),
         project.directory.resolve("build/jars/test-project-test-1.0.0.jar"), null))
 
-    project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8.7:jar", false)))
+    project.dependencies = new Dependencies(new DependencyGroup("test-compile", false, new Artifact("org.testng:testng:6.8.7:jar")))
     project.workflow = new Workflow(
         new FetchWorkflow(output,
             new CacheProcess(output, projectDir.resolve("build/cache").toString()),
