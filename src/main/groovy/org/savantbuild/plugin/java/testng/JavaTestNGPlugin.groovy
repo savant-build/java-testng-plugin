@@ -256,10 +256,10 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
 
     def testElement = (Element) document.getElementsByTagName("test").item(0);
     NodeList testClasses = testElement.getElementsByTagName("class")
-    for (int i=0; i < testClasses.length; i++) {
+    for (int i = 0; i < testClasses.length; i++) {
       def testClassElement = (Element) testClasses.item(i)
       NodeList testMethods = testClassElement.getElementsByTagName("test-method")
-      for (int j=0; j < testMethods.length; j++) {
+      for (int j = 0; j < testMethods.length; j++) {
         def testMethodElement = (Element) testMethods.item(j)
         if ("FAIL" == testMethodElement.getAttribute("status")) {
           // Currently if any methods fail in a class, we are going to re-run the entire test class.
