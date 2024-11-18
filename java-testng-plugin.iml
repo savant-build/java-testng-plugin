@@ -11,7 +11,17 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="savant-core" scope="PROVIDED" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/savantbuild/savant-core/2.0.1/savant-core-2.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/savantbuild/savant-core/2.0.1/savant-core-2.0.1-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
     <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
@@ -232,8 +242,28 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="savant-dependency-management" scope="PROVIDED" />
-    <orderEntry type="module" module-name="savant-utils" scope="PROVIDED" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/savantbuild/savant-dependency-management/2.0.1/savant-dependency-management-2.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/savantbuild/savant-dependency-management/2.0.1/savant-dependency-management-2.0.1-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/savantbuild/savant-utils/2.0.1/savant-utils-2.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/savantbuild/savant-utils/2.0.1/savant-utils-2.0.1-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
     <orderEntry type="module" module-name="savant-version" scope="PROVIDED" />
     <orderEntry type="module" module-name="dependency-plugin" />
     <orderEntry type="module" module-name="file-plugin" />
