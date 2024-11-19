@@ -22,6 +22,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.regex.Matcher
@@ -77,9 +78,9 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
    *
    * Supported command line options:
    *  --onlyFailed    only runs test that failed on previous test run
-   *  --onlyChanges   only run tests for java classes and test classes changed on this branch
-   *    --n=D         only look at last D commits
-   *  --keepXml       keep the testNG xml file
+   *  --onlyChanges   only run tests for java classes and test classes changed on this PR or branch
+   *    --commitRange=<commit> override default commit range of "--no-merges origin..HEAD". Can be range or commit.
+   *  --keepXML       keep the testNG XML config file (can be used in IntelliJ)
    *
    * @param attributes The named attributes.
    */
@@ -112,7 +113,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     process.consumeProcessOutput(System.out, System.err)
 
     int result = process.waitFor()
-    if (runtimeConfiguration.switches.booleanSwitches.contains("keepXml")) {
+    if (runtimeConfiguration.switches.booleanSwitches.contains("keepXML")) {
       Path testSuite = project.directory.resolve("build/test/${xmlFile.fileName.toString()}")
       Files.copy(xmlFile, testSuite)
       output.infoln("TestNG configuration saved in: $testSuite")
@@ -154,16 +155,34 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
         output.infoln("No test results found from a prior test run. File not found [" + testResults.toString() + "].")
       }
     } else if (runtimeConfiguration.switches.booleanSwitches.contains("onlyChanges")) {
-      output.infoln("Only run tests for changed files (⚠️ misses changes in dependencies).")
-      String numberCommitsFlag = ""
-      if (runtimeConfiguration.switches.valueSwitches.containsKey("n")) {
-        numberCommitsFlag = "-n " + runtimeConfiguration.switches.values("n").first()
-      }
-      String committedChanges = "git log --name-only --no-merges --pretty=oneline $numberCommitsFlag origin..HEAD".execute().text
-      String uncommittedChanges = "git diff -u --name-only HEAD".execute().text
+      output.infoln("Only running tests for changed files (⚠️ misses changes in dependencies).")
 
-      processGitOutput(committedChanges, classNames);
-      processGitOutput(uncommittedChanges, classNames);
+      String committedChanges
+      if (runtimeConfiguration.switches.valueSwitches.containsKey("commitRange")) {
+        // user specified a commit or commit range
+        String commitRange = runtimeConfiguration.switches.values("commitRange").first()
+        committedChanges = "git diff --name-only --pretty=oneline ${commitRange}".execute().text
+        output.debugln("git diff --name-only --pretty=oneline ${commitRange}\nreturned these changes:\n%s", committedChanges)
+      } else {
+        // attempt `gh pr diff`. Will fail if not a PR or gh cli not installed
+        Process prChanges = "gh pr diff --name-only".execute()
+        boolean notTimedOut = prChanges.waitFor(10, TimeUnit.SECONDS)
+        if (notTimedOut && prChanges.exitValue() == 0) {
+          committedChanges = prChanges.text
+          output.debugln("gh pr diff returned these changes:\n%s", committedChanges)
+        } else {
+          // fall back to branch and origin diff
+          output.debugln("gh pr diff command not successful. Falling back to git diff")
+          
+          committedChanges = "git diff --name-only --pretty=oneline --no-merges origin..HEAD".execute().text
+          output.debugln("git diff --name-only --pretty=oneline --no-merges origin..HEAD\nreturned these changes:\n%s", committedChanges)
+        }
+      }
+      String uncommittedChanges = "git diff -u --name-only HEAD".execute().text
+      output.debugln("uncommitted changes:\n%s", committedChanges)
+
+      processGitOutput(committedChanges, classNames)
+      processGitOutput(uncommittedChanges, classNames)
 
       List<String> dashTestFlags = new ArrayList<>()
       for (String s : classNames) {
