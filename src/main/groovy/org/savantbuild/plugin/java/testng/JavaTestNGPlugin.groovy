@@ -22,8 +22,11 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 import org.savantbuild.dep.domain.ArtifactID
 import org.savantbuild.domain.Project
@@ -73,6 +76,12 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
    *   groovyTestNG.test(groups: ["unit", "performance"])
    * </pre>
    *
+   * Supported command line options:
+   *  --onlyFailed    only runs test that failed on previous test run
+   *  --onlyChanges   only run tests for java classes and test classes changed on this PR or branch
+   *    --commitRange=<commit> override default commit range of "--no-merges origin..HEAD". Can be range or commit.
+   *  --keepXML       keep the testNG XML config file (can be used in IntelliJ)
+   *
    * @param attributes The named attributes.
    */
   void test(Map<String, Object> attributes) {
@@ -104,13 +113,19 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     process.consumeProcessOutput(System.out, System.err)
 
     int result = process.waitFor()
-    Files.delete(xmlFile)
+    if (runtimeConfiguration.switches.booleanSwitches.contains("keepXML")) {
+      Path testSuite = project.directory.resolve("build/test/${xmlFile.fileName.toString()}")
+      Files.copy(xmlFile, testSuite)
+      output.infoln("TestNG configuration saved in: $testSuite")
+    } else {
+      Files.delete(xmlFile)
+    }
     if (result != 0) {
       // Keep a copy of the last set of test results when there is a failure.
       Path testResults = project.directory.resolve("build/test-reports/testng-results.xml")
       if (testResults.toFile().exists()) {
         Path target = getLastTestResultsPath()
-        Files.deleteIfExists(target);
+        Files.deleteIfExists(target)
         Files.createDirectories(target.getParent())
         Files.createFile(target)
         Files.copy(testResults,
@@ -139,6 +154,41 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
       } else {
         output.infoln("No test results found from a prior test run. File not found [" + testResults.toString() + "].")
       }
+    } else if (runtimeConfiguration.switches.booleanSwitches.contains("onlyChanges")) {
+      output.infoln("Only running tests for changed files (⚠️ misses changes in dependencies).")
+
+      String committedChanges
+      if (runtimeConfiguration.switches.valueSwitches.containsKey("commitRange")) {
+        // user specified a commit or commit range
+        String commitRange = runtimeConfiguration.switches.values("commitRange").first()
+        committedChanges = "git diff --name-only --pretty=oneline ${commitRange}".execute().text
+        output.debugln("git diff --name-only --pretty=oneline ${commitRange}\nreturned these changes:\n%s", committedChanges)
+      } else {
+        // attempt `gh pr diff`. Will fail if not a PR or gh cli not installed
+        Process prChanges = "gh pr diff --name-only".execute()
+        boolean notTimedOut = prChanges.waitFor(10, TimeUnit.SECONDS)
+        if (notTimedOut && prChanges.exitValue() == 0) {
+          committedChanges = prChanges.text
+          output.debugln("gh pr diff returned these changes:\n%s", committedChanges)
+        } else {
+          // fall back to branch and origin diff
+          output.debugln("gh pr diff command not successful. Falling back to git diff")
+          
+          committedChanges = "git diff --name-only --pretty=oneline --no-merges origin..HEAD".execute().text
+          output.debugln("git diff --name-only --pretty=oneline --no-merges origin..HEAD\nreturned these changes:\n%s", committedChanges)
+        }
+      }
+      String uncommittedChanges = "git diff -u --name-only HEAD".execute().text
+      output.debugln("uncommitted changes:\n%s", committedChanges)
+
+      processGitOutput(committedChanges, classNames)
+      processGitOutput(uncommittedChanges, classNames)
+
+      List<String> dashTestFlags = new ArrayList<>()
+      for (String s : classNames) {
+        dashTestFlags.add("--test=" + s)
+      }
+      output.infoln("Found [" + classNames.size() + "] tests to run from changed files. Equivalent to running:\nsb test " + String.join(" ", dashTestFlags))
     } else {
       // Normal test execution, collect all tests
       project.publications.group("test").each { publication ->
@@ -274,4 +324,43 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     String tmpDir = System.getProperty("java.io.tmpdir")
     return Paths.get(tmpDir).resolve(project.name + "/test-reports/last/testng-results.xml")
   }
+
+  /**
+   * Process terse git output into a list of java test classes
+   * @param changes     output from git
+   * @param testClasses set of classes we'll add to
+   */
+  private static void processGitOutput(String changes, Set<String> testClasses) {
+    Pattern testFilePattern = Pattern.compile("src/test/java/(.*Test).java")
+    Pattern mainFilePattern = Pattern.compile("src/main/java/(.*).java")
+
+    for (String change : changes.lines()) {
+      Matcher testMatcher = testFilePattern.matcher(change)
+      if (testMatcher.matches()) {
+        // it's a java test file
+        String testFile = testMatcher.group(0)
+
+        // ensure it still exists
+        if (Files.exists(Paths.get(testFile))) {
+          String classPathFile = testMatcher.group(1)
+          String testClass = classPathFile.replaceAll("/", ".")
+          testClasses.add(testClass)
+        }
+      } else {
+        Matcher mainMatcher = mainFilePattern.matcher(change)
+        if (mainMatcher.matches()) {
+          // it's a java file, look for a corresponding test
+          String file = mainMatcher.group(1)
+          String testClass = file.replaceAll("/", ".") + "Test"
+          if (!testClasses.contains(testClass)) {
+            String testFile = "src/test/java/" + file + "Test.java"
+            if (Files.exists(Paths.get(testFile))) {
+              testClasses.add(testClass)
+            }
+          }
+        }
+      }
+    }
+  }
+
 }
