@@ -114,6 +114,19 @@ class JavaTestNGPluginTest {
   }
 
   @Test
+  void test_coverage() throws Exception {
+    JavaTestNGPlugin plugin = new JavaTestNGPlugin(project, new RuntimeConfiguration(), output)
+    plugin.settings.javaVersion = "1.8"
+    plugin.settings.codeCoverage = true
+
+    plugin.test()
+    assertTestsRan("org.savantbuild.test.MyClassTest", "org.savantbuild.test.MyClassIntegrationTest", "org.savantbuild.test.MyClassUnitTest")
+
+    plugin.test(null)
+    assertTestsRan("org.savantbuild.test.MyClassTest", "org.savantbuild.test.MyClassIntegrationTest", "org.savantbuild.test.MyClassUnitTest")
+  }
+
+  @Test
   void skipTests() throws Exception {
     RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration()
     runtimeConfiguration.switches.booleanSwitches.add("skipTests")
