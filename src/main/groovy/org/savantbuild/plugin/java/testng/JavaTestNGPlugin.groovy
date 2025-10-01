@@ -390,6 +390,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     def coverageClassPath = dependencyPlugin.classpath {
       project.publications.group("main").each { publication -> path(location: publication.file.toAbsolutePath()) }
     }
+    // add each JAR from the Savant main publication group to be analyzed
     coverageClassPath.paths.each { p ->
       analyzer.analyzeAll(p.toFile())
     }
