@@ -28,6 +28,13 @@ import java.util.jar.JarFile
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+import org.jacoco.core.analysis.Analyzer
+import org.jacoco.core.tools.ExecFileLoader
+import org.jacoco.core.analysis.CoverageBuilder
+import org.jacoco.report.DirectorySourceFileLocator
+import org.jacoco.report.FileMultiReportOutput
+import org.jacoco.report.MultiSourceFileLocator
+import org.jacoco.report.html.HTMLFormatter
 import org.savantbuild.dep.domain.ArtifactID
 import org.savantbuild.domain.Project
 import org.savantbuild.io.FileTools

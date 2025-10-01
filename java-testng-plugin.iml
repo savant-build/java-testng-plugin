@@ -271,33 +271,33 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.agent/0.8.12/org.jacoco.agent-0.8.12.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.agent/0.8.13/org.jacoco.agent-0.8.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.agent/0.8.12/org.jacoco.agent-0.8.12-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.agent/0.8.13/org.jacoco.agent-0.8.13-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.report/0.8.12/org.jacoco.report-0.8.12.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.report/0.8.13/org.jacoco.report-0.8.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.report/0.8.12/org.jacoco.report-0.8.12-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.report/0.8.13/org.jacoco.report-0.8.13-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.core/0.8.12/org.jacoco.core-0.8.12.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.core/0.8.13/org.jacoco.core-0.8.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.core/0.8.12/org.jacoco.core-0.8.12-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.core/0.8.13/org.jacoco.core-0.8.13-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -392,33 +392,33 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.7/asm-9.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.8.0/asm-9.8.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.7.0/asm-9.7.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.8.0/asm-9.8.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-commons/9.7/asm-commons-9.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-commons/9.8.0/asm-commons-9.8.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-commons/9.7.0/asm-commons-9.7.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-commons/9.8.0/asm-commons-9.8.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-tree/9.7/asm-tree-9.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-tree/9.8.0/asm-tree-9.8.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-tree/9.7.0/asm-tree-9.7.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-tree/9.8.0/asm-tree-9.8.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
