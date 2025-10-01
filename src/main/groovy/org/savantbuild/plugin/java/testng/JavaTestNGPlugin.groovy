@@ -401,7 +401,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     def visitor = formatter.createVisitor(new FileMultiReportOutput(reportDirectory))
     visitor.visitInfo(loader.sessionInfoStore.infos,
         loader.executionDataStore.contents)
-    def sourceLocator = new MultiSourceFileLocator(4);
+    def sourceLocator = new MultiSourceFileLocator(4)
     sourceLocator.add(new DirectorySourceFileLocator(new File(project.directory.toFile(), "src/main/java"),
         "utf-8",
         4))
