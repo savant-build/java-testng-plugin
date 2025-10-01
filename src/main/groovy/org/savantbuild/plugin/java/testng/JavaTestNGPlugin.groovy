@@ -28,6 +28,7 @@ import java.util.jar.JarFile
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+import org.jacoco.agent.AgentJar
 import org.jacoco.core.analysis.Analyzer
 import org.jacoco.core.tools.ExecFileLoader
 import org.jacoco.core.analysis.CoverageBuilder
@@ -121,6 +122,9 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     process.consumeProcessOutput(System.out, System.err)
 
     int result = process.waitFor()
+    if (settings.codeCoverage) {
+      produceCodeCoverageReports()
+    }
     if (runtimeConfiguration.switches.booleanSwitches.contains("keepXML")) {
       Path testSuite = project.directory.resolve("build/test/${xmlFile.fileName.toString()}")
       Files.copy(xmlFile, testSuite)
@@ -405,7 +409,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
   }
 
   File getCodeCoverageFile() {
-    project.directory.resolve("build/jacoco.exec").toFile()
+    project.directory.resolve("build/jacoco.exec").toAbsolutePath().toFile()
   }
 
   String getCodeCoverageArguments() {

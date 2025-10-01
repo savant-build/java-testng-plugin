@@ -124,6 +124,10 @@ class JavaTestNGPluginTest {
 
     plugin.test(null)
     assertTestsRan("org.savantbuild.test.MyClassTest", "org.savantbuild.test.MyClassIntegrationTest", "org.savantbuild.test.MyClassUnitTest")
+
+    // assert our code coverage report exists
+    assertTrue(Files.isDirectory(projectDir.resolve("test-project/build/coverage-reports")))
+    assertTrue(Files.isRegularFile(projectDir.resolve("test-project/build/coverage-reports/index.html")))
   }
 
   @Test
