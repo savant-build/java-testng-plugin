@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2013-2025, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,14 @@ import java.util.jar.JarFile
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+import org.jacoco.agent.AgentJar
+import org.jacoco.core.analysis.Analyzer
+import org.jacoco.core.tools.ExecFileLoader
+import org.jacoco.core.analysis.CoverageBuilder
+import org.jacoco.report.DirectorySourceFileLocator
+import org.jacoco.report.FileMultiReportOutput
+import org.jacoco.report.MultiSourceFileLocator
+import org.jacoco.report.html.HTMLFormatter
 import org.savantbuild.dep.domain.ArtifactID
 import org.savantbuild.domain.Project
 import org.savantbuild.io.FileTools
@@ -106,13 +114,17 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     }
 
     Path xmlFile = buildXMLFile(attributes["groups"], attributes["exclude"])
-    String command = "${javaPath} ${settings.jvmArguments} ${classpath.toString("-classpath ")} org.testng.TestNG -d ${settings.reportDirectory} ${settings.testngArguments} ${xmlFile}"
+    def jacocoArgs = getCodeCoverageArguments()
+    String command = "${javaPath} ${settings.jvmArguments} ${classpath.toString("-classpath ")}${jacocoArgs} org.testng.TestNG -d ${settings.reportDirectory} ${settings.testngArguments} ${xmlFile}"
     output.debugln("Running command [%s]", command)
 
     Process process = command.execute(null, project.directory.toFile())
     process.consumeProcessOutput(System.out, System.err)
 
     int result = process.waitFor()
+    if (settings.codeCoverage) {
+      produceCodeCoverageReports()
+    }
     if (runtimeConfiguration.switches.booleanSwitches.contains("keepXML")) {
       Path testSuite = project.directory.resolve("build/test/${xmlFile.fileName.toString()}")
       Files.copy(xmlFile, testSuite)
@@ -173,7 +185,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
         } else {
           // fall back to branch and origin diff
           output.debugln("gh pr diff command not successful. Falling back to git diff")
-          
+
           committedChanges = "git diff --name-only --pretty=oneline --no-merges origin..HEAD".execute().text
           output.debugln("git diff --name-only --pretty=oneline --no-merges origin..HEAD\nreturned these changes:\n%s", committedChanges)
         }
@@ -327,7 +339,7 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
 
   /**
    * Process terse git output into a list of java test classes
-   * @param changes     output from git
+   * @param changes output from git
    * @param testClasses set of classes we'll add to
    */
   private static void processGitOutput(String changes, Set<String> testClasses) {
@@ -363,4 +375,49 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     }
   }
 
+  def produceCodeCoverageReports() {
+    def loader = new ExecFileLoader()
+    // produced by the Java Agent we instrumented our test run with
+    def execFile = getCodeCoverageFile()
+    if (!execFile.exists()) {
+      fail("${execFile} was not found")
+    }
+    loader.load(execFile)
+    def builder = new CoverageBuilder()
+
+    def analyzer = new Analyzer(loader.executionDataStore, builder)
+    // refine our analysis to only include the main JAR that we publish
+    def coverageClassPath = dependencyPlugin.classpath {
+      project.publications.group("main").each { publication -> path(location: publication.file.toAbsolutePath()) }
+    }
+    // add each JAR from the Savant main publication group to be analyzed
+    coverageClassPath.paths.each { p ->
+      analyzer.analyzeAll(p.toFile())
+    }
+
+    def bundle = builder.getBundle("JaCoCo Coverage Report - ${project.name}")
+    def formatter = new HTMLFormatter()
+    def reportDirectory = new File(project.directory.toFile(), "build/coverage-reports")
+    def visitor = formatter.createVisitor(new FileMultiReportOutput(reportDirectory))
+    visitor.visitInfo(loader.sessionInfoStore.infos,
+        loader.executionDataStore.contents)
+    def sourceLocator = new MultiSourceFileLocator(4)
+    sourceLocator.add(new DirectorySourceFileLocator(new File(project.directory.toFile(), "src/main/java"),
+        "utf-8",
+        4))
+    visitor.visitBundle(bundle, sourceLocator)
+    visitor.visitEnd()
+  }
+
+  File getCodeCoverageFile() {
+    project.directory.resolve("build/jacoco.exec").toAbsolutePath().toFile()
+  }
+
+  String getCodeCoverageArguments() {
+    if (!settings.codeCoverage) {
+      return ""
+    }
+    def jacocoPath = AgentJar.extractToTempLocation()
+    " -javaagent:${jacocoPath}=destfile=${getCodeCoverageFile()}"
+  }
 }

@@ -268,6 +268,39 @@
     <orderEntry type="module" module-name="dependency-plugin" />
     <orderEntry type="module" module-name="file-plugin" />
     <orderEntry type="module" module-name="savant-io" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.agent/0.8.13/org.jacoco.agent-0.8.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.agent/0.8.13/org.jacoco.agent-0.8.13-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.report/0.8.13/org.jacoco.report-0.8.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.report/0.8.13/org.jacoco.report-0.8.13-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.core/0.8.13/org.jacoco.core-0.8.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/jacoco/org.jacoco.core/0.8.13/org.jacoco.core-0.8.13-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
@@ -315,17 +348,6 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.2.0/asm-9.2.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.2.0/asm-9.2.0-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="RUNTIME">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/.savant/cache/org/apache/ant/ant/1.9.4/ant-1.9.4.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -364,6 +386,39 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$MODULE_DIR$/.savant/cache/org/tukaani/xz/1.4.0/xz-1.4.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.8.0/asm-9.8.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm/9.8.0/asm-9.8.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-commons/9.8.0/asm-commons-9.8.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-commons/9.8.0/asm-commons-9.8.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-tree/9.8.0/asm-tree-9.8.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/org/ow2/asm/asm-tree/9.8.0/asm-tree-9.8.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2024, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ class JavaTestNGSettings {
   Path reportDirectory = Paths.get("build/test-reports")
 
   List<String> listeners = []
+
+  boolean codeCoverage
 
   List<Map<String, Object>> dependencies = [
       [group: "provided", transitive: true, fetchSource: false, transitiveGroups: ["provided", "compile", "runtime"]],
