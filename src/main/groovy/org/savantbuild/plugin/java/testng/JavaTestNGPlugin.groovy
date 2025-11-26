@@ -118,7 +118,9 @@ class JavaTestNGPlugin extends BaseGroovyPlugin {
     String command = "${javaPath} ${settings.jvmArguments} ${classpath.toString("-classpath ")}${jacocoArgs} org.testng.TestNG -d ${settings.reportDirectory} ${settings.testngArguments} ${xmlFile}"
     output.debugln("Running command [%s]", command)
 
-    Process process = new ProcessBuilder(command.split(" "))
+    // StringTokenizer handles multiple spaces, etc. for us (jvmArguments is optional)
+    def args = new StringTokenizer(command).toList() as List<String>
+    Process process = new ProcessBuilder(args)
     // need to use inheritIO as opposed to process.consumeProcessOutput(System.out, System.err) because that will
     // cause buffering that hides test output that does not end with a carriage return
     .inheritIO()
