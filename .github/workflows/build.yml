@@ -1,0 +1,65 @@
+---
+name: build
+
+on:
+  - pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: /usr/bin/bash -l -e -o pipefail {0}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: |
+            8
+            21
+            17
+      - name: setup groovy
+        run: |
+          GROOVY_VERSION="4.0.22"
+          curl -OL https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-${GROOVY_VERSION}.zip
+          unzip apache-groovy-binary-${GROOVY_VERSION}.zip
+          echo "GROOVY_HOME=$(pwd)/groovy-${GROOVY_VERSION}" >> $GITHUB_ENV
+
+      - name: savant setup
+        run: |
+          curl -O https://repository.savantbuild.org/org/savantbuild/savant-core/2.0.2/savant-2.0.2.tar.gz
+          tar xzvf savant-2.0.2.tar.gz
+          savant-2.0.2/bin/sb --version
+          SAVANT_PATH=$(realpath -s "./savant-2.0.2/bin")
+          echo "${SAVANT_PATH}" >> $GITHUB_PATH
+          mkdir -p ~/.savant/plugins
+          cat << EOF > ~/.savant/plugins/org.savantbuild.plugin.java.properties
+          1.8=${JAVA_HOME_8_X64}
+          17=${JAVA_HOME_17_X64}
+          21=${JAVA_HOME_21_X64}
+          EOF
+          echo "~/.savant/plugins/org.savantbuild.plugin.java.properties"
+          cat ~/.savant/plugins/org.savantbuild.plugin.java.properties
+          cat << EOF > ~/.savant/plugins/org.savantbuild.plugin.groovy.properties
+          4.0=${GROOVY_HOME}
+          EOF
+          echo "~/.savant/plugins/org.savantbuild.plugin.groovy.properties"
+          cat ~/.savant/plugins/org.savantbuild.plugin.groovy.properties
+      # Takes some time, better to tell difference between this step and actual test run time
+      - name: compile/pull Savant dependencies
+        run: |
+          $JAVA_HOME/bin/java -version
+          sb --version
+          sb clean compile
+      - name: run tests/integrate
+        run: |
+          sb clean test
+      - name: capture reports
+        uses: actions/upload-artifact@v4
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          name: testng_reports
+          path: build/test-reports/
