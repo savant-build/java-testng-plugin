@@ -22,7 +22,7 @@ jobs:
             17
       - name: setup groovy
         run: |
-          GROOVY_VERSION="4.0.29"
+          GROOVY_VERSION="4.0.22"
           curl -OL https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-${GROOVY_VERSION}.zip
           unzip apache-groovy-binary-${GROOVY_VERSION}.zip
           echo "GROOVY_HOME=$(pwd)/groovy-${GROOVY_VERSION}" >> $GITHUB_ENV
