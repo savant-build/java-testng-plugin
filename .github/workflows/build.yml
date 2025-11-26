@@ -20,6 +20,13 @@ jobs:
           java-version: |
             21
             17
+      - name: setup groovy
+        run: |
+          GROOVY_VERSION="4.0.29"
+          curl -OL https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-${GROOVY_VERSION}.zip
+          unzip apache-groovy-binary-${GROOVY_VERSION}.zip
+          echo "GROOVY_HOME=$(pwd)/groovy-${GROOVY_VERSION}" >> $GITHUB_ENV
+
       - name: savant setup
         run: |
           curl -O https://repository.savantbuild.org/org/savantbuild/savant-core/2.0.2/savant-2.0.2.tar.gz
@@ -28,13 +35,17 @@ jobs:
           SAVANT_PATH=$(realpath -s "./savant-2.0.2/bin")
           echo "${SAVANT_PATH}" >> $GITHUB_PATH
           mkdir -p ~/.savant/plugins
-          # For now, using the JDK that comes on the GHA runner
           cat << EOF > ~/.savant/plugins/org.savantbuild.plugin.java.properties
           17=${JAVA_HOME_17_X64}
           21=${JAVA_HOME_21_X64}
           EOF
           echo "~/.savant/plugins/org.savantbuild.plugin.java.properties"
           cat ~/.savant/plugins/org.savantbuild.plugin.java.properties
+          cat << EOF > ~/.savant/plugins/org.savantbuild.plugin.groovy.properties
+          4.0=${GROOVY_HOME}
+          EOF
+          echo "~/.savant/plugins/org.savantbuild.plugin.groovy.properties"
+          cat ~/.savant/plugins/org.savantbuild.plugin.groovy.properties
       # Takes some time, better to tell difference between this step and actual test run time
       - name: compile/pull Savant dependencies
         run: |
